@@ -5,13 +5,12 @@
  * @param verbose Werther to print logs or not. Default to false because not needed in most of the cases.
  */
 import {validateArgs} from "./validation/validation";
-import {DownloaderError} from "./errors/errors";
 import {downloadHttp} from "./protocols/http";
 import {downloadHttps} from "./protocols/https";
 
 const downloader = (url: string, destination: string, name: string, verbose: boolean = false): Promise<number> => {
     return new Promise<number>((resolve, reject) => {
-        validateArgs(url, destination, name, verbose).then(async options => {
+        validateArgs(url, destination, name).then(async options => {
             try {
                 switch (options.protocol) {
                     case 'http:':
@@ -20,6 +19,10 @@ const downloader = (url: string, destination: string, name: string, verbose: boo
                     case 'https:':
                         await downloadHttps(url, destination, name, verbose);
                         break;
+                    //if we wanted:
+                    // case 'ftp:':
+                    //     await downloadFtp(url, destination, name, verbose, port, username, password);
+                    //     break;
                 }
                 resolve(0);
             } catch (e) {

@@ -12,7 +12,7 @@ const stringIsAValidUrl = (s: string, protocols: string[]) => {
             : false;
 };
 
-const validateUrl = async (url: string, verbose: boolean): Promise<any> => {
+const validateUrl = async (url: string): Promise<any> => {
     try {
         let parsed = stringIsAValidUrl(url, ['http', 'https']);
         if (parsed === false) {
@@ -45,8 +45,8 @@ const validateName = (destination: string, name: string): any => {
     }
 }
 
-export const validateArgs = async (url: string, destination: string, name: string, verbose: boolean): Promise<any> => {
+export const validateArgs = async (url: string, destination: string, name: string): Promise<any> => {
     validateDestination(destination);
     validateName(destination, name);
-    return await validateUrl(url, verbose);
+    return await validateUrl(url);
 }
