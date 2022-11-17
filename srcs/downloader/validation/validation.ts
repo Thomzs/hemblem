@@ -12,7 +12,7 @@ const stringIsAValidUrl = (s: string, protocols: string[]) => {
             : false;
 };
 
-const validateUrl = async (url: string): Promise<any> => {
+const validateUrl = (url: string): any => {
     try {
         let parsed = stringIsAValidUrl(url, ['http', 'https']);
         if (parsed === false) {
@@ -27,16 +27,19 @@ const validateUrl = async (url: string): Promise<any> => {
     }
 }
 
-const validateDestination = (dest: string) => {
-    try {
-        if (!fs.lstatSync(dest).isDirectory()) {
-            throw Error();
+const validateDestination = async (dest: string) => {
+    return new Promise<void>((resolve, reject) => {
+        try {
+            if (!fs.lstatSync(dest).isDirectory()) {
+                throw Error();
+            }
+            fs.access(dest, fs.constants.W_OK, (err => reject(err)));
+            resolve();
+        } catch (e) {
+            reject(new DownloaderError(`Error with destination ${dest}. Either it's not a folder, it does not exist` +
+                " or you don't have write permissions", INVALID_DESTINATION));
         }
-        fs.accessSync(dest, fs.constants.W_OK);
-    } catch(e) {
-        throw new DownloaderError(`Error with destination ${dest}. Either it's not a folder, it does not exist` +
-            " or you don't have write permissions", INVALID_DESTINATION);
-    }
+    });
 }
 
 const validateName = (destination: string, name: string): any => {
@@ -46,7 +49,7 @@ const validateName = (destination: string, name: string): any => {
 }
 
 export const validateArgs = async (url: string, destination: string, name: string): Promise<any> => {
-    validateDestination(destination);
+    await validateDestination(destination);
     validateName(destination, name);
-    return await validateUrl(url);
+    return validateUrl(url);
 }
